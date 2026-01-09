@@ -103,6 +103,44 @@ jdupes -r "$(pwd)/folder1" "$(pwd)/folder2" > duplicates.log
 
 ---
 
+### 4. Empty Folder Removal (`remove-empty-folders.sh`)
+
+Remove empty directories left behind after junk cleanup or duplicate file deletion.
+
+**Key Features:**
+
+- Bottom-up recursive removal (processes deepest folders first)
+- Excludes version control directories (.git, .svn, etc.)
+- Minimum depth protection prevents accidental root removal
+- Hidden folder control (excluded by default, use --include-hidden)
+- Real-time progress indicators during scan and removal
+- Detailed logging with timestamps
+- Verbose mode shows every folder processed
+- Safe default (dry-run mode)
+- Can be chained with other cleanup scripts
+
+**Quick Start:**
+
+```bash
+# Preview what will be removed (dry-run)
+./remove-empty-folders.sh /path/to/backup
+
+# Actually remove empty folders
+./remove-empty-folders.sh --apply /path/to/backup
+
+# Remove from multiple locations
+./remove-empty-folders.sh --apply backup1 backup2 backup3
+
+# Only remove deeply nested empty folders (depth 2+)
+./remove-empty-folders.sh --apply --min-depth=2 /path/to/backup
+
+# Chain with cleanup script (recommended workflow)
+./organize-backups.sh --apply --clean-only backup1 && \
+./remove-empty-folders.sh --apply backup1
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -143,6 +181,32 @@ sudo apt install jdupes
 sudo yum install jdupes
 ```
 
+## ✨ Version 2.1.0 Features (Latest)
+
+**NEW: Two-Step Scan-Then-Apply Workflow**
+
+- All scripts now support scanning first, then applying changes from saved reports
+- **Report files** automatically saved to `archives/` directory
+- **No re-scanning** needed - instant execution from saved reports
+- Review and edit reports before applying changes
+
+Scripts with this feature:
+
+- `remove-empty-folders.sh` - Save/read empty folder lists with `--from-report`
+- `organize-backups.sh` - Junk directories saved to report files
+- `merge-folders.sh` - File copy lists saved to report files
+
+**Example Workflow:**
+
+```bash
+# Step 1: Scan and save report
+./remove-empty-folders.sh /path/to/backup
+# Creates: archives/empty_folders_YYYYMMDD_HHMMSS.txt
+
+# Step 2: Review report file, then apply
+./remove-empty-folders.sh --apply --from-report=archives/empty_folders_*.txt
+```
+
 ## ✨ Version 2.0.0 Features
 
 All scripts have been enhanced with:
@@ -163,9 +227,11 @@ Each script includes comprehensive built-in help:
 ./organize-backups.sh --help
 ./merge-folders.sh --help
 ./remove-duplicates-by-priority.sh --help
+./remove-empty-folders.sh --help
 ```
 
 The `--help` flag provides:
+
 - Complete usage examples
 - All available options
 - Detailed explanations of behavior

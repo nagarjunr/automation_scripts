@@ -56,6 +56,10 @@ OUT_DIR="./archives"
 SKIP_SIZE="no"
 CLEAN_ONLY="no"
 VERBOSE="no"
+FROM_REPORT=""
+
+# Report file for junk directories
+JUNK_REPORT="$OUT_DIR/junk_directories_$(date '+%Y%m%d_%H%M%S').txt"
 
 #===============================================================================
 # Cleanup Patterns
@@ -247,6 +251,11 @@ remove_junk() {
   echo "$matches" | head -n 20 | while read -r item; do
     log_verbose "    - $(basename "$item")"
   done
+  
+  # Save to report file
+  if [[ -n "$JUNK_REPORT" ]]; then
+    echo "$matches" >> "$JUNK_REPORT"
+  fi
 
   if [[ "$APPLY" == "yes" ]]; then
     log "  Deleting $count junk items..."
@@ -487,7 +496,6 @@ log ""
 if [[ "$SKIP_SIZE" == "no" ]]; then
   log "Calculating initial sizes..."
   for f in "${FOLDERS[@]}"; do
-    local size
     size="$(human_size "$f")"
     log "  $(printf '%-10s' "$size") $(basename "$f")"
   done

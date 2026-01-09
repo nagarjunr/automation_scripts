@@ -44,6 +44,18 @@ set -euo pipefail  # Exit on error, undefined variables, and pipe failures
 readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_NAME="$(basename "$0")"
 
+# Default settings
+APPLY="no"
+VERBOSE="no"
+FROM_REPORT=""
+
+# Create archives directory for reports
+ARCHIVE_DIR="archives"
+mkdir -p "$ARCHIVE_DIR"
+
+# Report file for merge operations
+MERGE_REPORT="$ARCHIVE_DIR/merge_files_$(date '+%Y%m%d_%H%M%S').txt"
+
 # File patterns to exclude from merge
 readonly EXCLUDE_PATTERNS=(
   ".git"
