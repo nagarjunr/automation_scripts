@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+env/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+dist/
+build/
+*.o
+*.a
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+.cache/
+
+# Personal/private documentation (contains personal data)
+CLEANUP_SUMMARY_*.md
+REDUNDANT_FILES_REPORT.md
+archives/
+
+# Internal development documentation (not needed for public release)
+REFACTORING_SUMMARY.md
+TESTING_REPORT.md
+USAGE_GUIDE-*.md

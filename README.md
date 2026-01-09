@@ -1,34 +1,105 @@
 # Automation Scripts
 
-A collection of bash and Python scripts for day-to-day productivity improvements and system automation tasks.
+A collection of bash scripts for backup management, file deduplication, and system automation tasks.
 
 ## 📋 Overview
 
-This repository contains various automation scripts (bash, Python, and more) designed to streamline common workflows, reduce manual effort, and improve efficiency in daily development and system management tasks.
+This repository contains production-ready automation scripts designed to streamline backup management, reduce redundant data, and improve efficiency in system administration tasks.
 
 ## 🛠️ Available Scripts
 
-### 1. Backup Organization (`organize_backups.sh`)
+### 1. Backup Organization (`organize-backups.sh`)
 
 Efficiently clean, deduplicate, and archive backup folders to make them smaller and faster to copy.
 
 **Key Features:**
-- Removes Python virtual environments and cache directories
-- Content-based file deduplication across multiple backup folders
+
+- Removes 24+ types of junk files (Python venvs, node_modules, build artifacts, IDE files)
+- Content-based file deduplication with jdupes
 - Creates compressed `.tar.gz` archives
 - Dry-run mode by default (safe preview before making changes)
-- Detailed logging and before/after size reports
+- Verbose mode for detailed progress tracking
+- Cross-platform (macOS/Linux)
+- Human-readable size reports
 
 **Quick Start:**
-```bash
-# Dry run (preview only)
-./organize_backups.sh backup1 backup2 backup3 backup4
 
-# Clean and archive
-./organize_backups.sh --apply --out=./archives backup1 backup2 backup3 backup4
+```bash
+# Preview what will be cleaned (dry-run)
+./organize-backups.sh backup1 backup2
+
+# Clean junk files only
+./organize-backups.sh --apply --clean-only backup1 backup2
+
+# Clean, deduplicate, and create archives
+./organize-backups.sh --apply --dedupe=report --out=./archives backup1 backup2
+
+# Verbose mode with progress indicators
+./organize-backups.sh --verbose --apply --clean-only backup1
+
+# Get help on all options
+./organize-backups.sh --help
 ```
 
-📖 **Full Documentation:** [USAGE_GUIDE-organize_backups.md](USAGE_GUIDE-organize_backups.md)
+---
+
+### 2. Folder Merging (`merge-folders.sh`)
+
+Merge source folder into destination folder, copying only unique files while preserving all existing destination files.
+
+**Key Features:**
+
+- Safe merging (destination files are never overwritten)
+- Automatic exclusion of common system files (.git, .DS_Store, Thumbs.db)
+- Preview mode shows exactly what will be copied
+- Progress indicators for large operations
+- Cross-platform file size detection
+- Preserves file permissions and timestamps
+
+**Quick Start:**
+
+```bash
+# Preview merge (dry-run)
+./merge-folders.sh /path/to/source /path/to/destination
+
+# Execute merge
+./merge-folders.sh /path/to/source /path/to/destination --apply
+
+# Verbose mode
+./merge-folders.sh /path/to/source /path/to/destination --apply --verbose
+```
+
+---
+
+### 3. Duplicate File Removal (`remove-duplicates-by-priority.sh`)
+
+Delete duplicate files based on folder priority, keeping files from highest-priority folders.
+
+**Key Features:**
+
+- Priority-based duplicate removal (keep files from preferred folders)
+- Auto-detects folder priorities from jdupes report
+- Custom priority specification with --priority flag
+- Verbose mode shows detailed group-by-group decisions
+- Progress tracking for large operations
+- Safe default (dry-run mode)
+- Handles missing files gracefully
+
+**Quick Start:**
+
+```bash
+# Generate duplicate report
+jdupes -r "$(pwd)/folder1" "$(pwd)/folder2" > duplicates.log
+
+# Preview deletion (auto-detect priority)
+./remove-duplicates-by-priority.sh duplicates.log
+
+# Execute with custom priority (folder1 > folder2 > folder3)
+./remove-duplicates-by-priority.sh duplicates.log --priority=folder1,folder2,folder3 --apply
+
+# Verbose mode to see detailed decisions
+./remove-duplicates-by-priority.sh duplicates.log --priority=folder1,folder2,folder3 --verbose
+```
 
 ---
 
@@ -37,64 +108,129 @@ Efficiently clean, deduplicate, and archive backup folders to make them smaller 
 ### Prerequisites
 
 **For bash scripts:**
+
 - bash (zsh compatible)
-- Standard Unix tools: `find`, `du`, `tar`
-
-**For Python scripts:**
-- Python 3.7+ (check individual script requirements)
-- pip for installing dependencies
-
-Some scripts may have additional requirements listed in their individual usage guides.
+- Standard Unix tools: `find`, `du`, `tar`, `stat`
+- `jdupes` (for deduplication features)
+  - macOS: `brew install jdupes`
+  - Linux: `apt install jdupes` or `yum install jdupes`
 
 ### Installation
 
 1. Clone this repository:
+
 ```bash
 git clone <repository-url>
 cd automation_scripts
 ```
 
 2. Make shell scripts executable:
+
 ```bash
 chmod +x *.sh
 ```
 
-3. Install Python dependencies (if using Python scripts):
+3. Install jdupes (for deduplication):
+
 ```bash
-pip install -r requirements.txt  # if requirements file exists
-# or check individual script usage guides for dependencies
+# macOS
+brew install jdupes
+
+# Linux (Debian/Ubuntu)
+sudo apt install jdupes
+
+# Linux (RHEL/CentOS)
+sudo yum install jdupes
 ```
 
-4. Review the usage guide for the script you want to use
+## ✨ Version 2.0.0 Features
 
-## 📚 Documentation Structure
+All scripts have been enhanced with:
 
-Each script has its own detailed usage guide:
-- `USAGE_GUIDE-<script-name>.md` - Comprehensive documentation for each script
+- **Comprehensive Help Documentation** - Use `--help` flag on any script
+- **Enhanced Logging** - Timestamped logs with log levels (INFO, ERROR, VERBOSE)
+- **Progress Indicators** - Real-time feedback for long-running operations
+- **Cross-Platform Support** - Works on macOS and Linux
+- **Verbose Mode** - Detailed output with `--verbose` flag
+- **Production Ready** - Robust error handling and input validation
+- **Generic & Reusable** - No vendor-specific code, ready for any use case
+
+## 📚 Documentation
+
+Each script includes comprehensive built-in help:
+
+```bash
+./organize-backups.sh --help
+./merge-folders.sh --help
+./remove-duplicates-by-priority.sh --help
+```
+
+The `--help` flag provides:
+- Complete usage examples
+- All available options
+- Detailed explanations of behavior
+- Common use cases
 
 ## 🤝 Contributing
 
-Feel free to add your own automation scripts to this repository. When adding a new script:
+Contributions are welcome! When adding a new script:
 
-1. Create the script with a descriptive name
-2. Add a corresponding `USAGE_GUIDE-<script-name>.md` file
-3. Update this README with a brief description and link to the usage guide
-4. Include examples and prerequisites
+1. Follow the existing code structure and naming conventions
+2. Include comprehensive header documentation
+3. Add `--help` flag with detailed usage examples
+4. Implement dry-run mode by default for safety
+5. Add progress indicators for long-running operations
+6. Update this README with script description
+7. Test thoroughly on both macOS and Linux (if applicable)
 
 ## 📝 License
 
-These scripts are provided as-is for personal and professional use.
+MIT License - Feel free to use, modify, and distribute these scripts.
 
 ## ⚠️ Safety First
 
-Most scripts include:
-- Dry-run mode by default (preview before making changes)
-- Detailed logging
-- Error handling and validation
-- Clear documentation of what will be modified
+All scripts include multiple safety features:
 
-Always review a script's usage guide and run in dry-run mode first before applying changes.
+- **Dry-run mode by default** - Preview changes before applying
+- **Detailed logging** - Track what was changed and why
+- **Error handling** - Graceful failure with helpful messages
+- **Input validation** - Verify parameters before execution
+- **Progress indicators** - Know what's happening during execution
+- **Clear documentation** - Comprehensive `--help` and usage guides
+
+**Best Practices:**
+
+1. Always run with `--help` first to understand options
+2. Use dry-run mode (default) to preview changes
+3. Review the output before using `--apply`
+4. Keep backups of important data
+5. Test on a small dataset first
+
+## 🔧 Troubleshooting
+
+**jdupes not found:**
+
+```bash
+# macOS
+brew install jdupes
+
+# Linux
+sudo apt install jdupes  # or yum install jdupes
+```
+
+**Permission denied:**
+
+```bash
+chmod +x *.sh
+```
+
+**Script-specific issues:**
+
+- Use `--verbose` flag for detailed output
+- Check the `--help` documentation for each script
+- Run in dry-run mode first to preview changes
 
 ---
 
-**Last Updated:** January 2026
+**Version:** 2.0.0  
+**Last Updated:** January 8, 2026
